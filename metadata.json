@@ -1,0 +1,6 @@
+{
+  "name": "포케 재료 양 조절 키오스크",
+  "description": "포케 볼 기본 재료의 양을 8칸 기준으로 드래그하여 조절하는 인터랙티브 키오스크 인터페이스",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
