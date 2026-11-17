@@ -33,6 +33,8 @@ interface IngredientColumnProps {
     trackWidth: number
   ) => void;
   isError: boolean;
+  badgeFontSize?: number;
+  labelFontSize?: number;
 }
 
 // Convert level (0~2) to track bottom %
@@ -45,14 +47,14 @@ const L = (p: number): number =>
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 
-// Ingredient visual volume scale fine-tuning
+// Ingredient visual volume scale fine-tuning (모든 재료 아이콘이 막대 폭(88px) 이하로 유지되도록 보정)
 const INGREDIENT_VISUAL_SCALE: Record<string, number> = {
-  mix: 1.05,
-  seaweed: 1.05,
-  crab: 1.18,
-  onion: 1.18,
-  corn: 1.12,
-  bean: 1.12,
+  mix: 1.08,
+  seaweed: 1.08,
+  crab: 1.12,
+  onion: 1.16,
+  corn: 1.15,
+  bean: 1.05,
   redcabbage: 1.12,
 };
 
@@ -68,6 +70,8 @@ export const IngredientColumn: React.FC<IngredientColumnProps> = ({
   onDragMove,
   onRelease,
   isError,
+  badgeFontSize = 28,
+  labelFontSize = 26,
 }) => {
   const [level, setLevel] = useState<number>(count);
   const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -228,16 +232,17 @@ export const IngredientColumn: React.FC<IngredientColumnProps> = ({
 
   return (
     <div
-      className="flex flex-col items-center justify-between h-full touch-none select-none cursor-pointer w-full"
+      className="flex flex-col items-center touch-none select-none cursor-pointer shrink-0"
+      style={{ width: '80px' }}
     >
-      {/* Top Portion Pill */}
+      {/* Top Portion Pill (비례 확대된 76px 원형 뱃지, 28px 숫자) */}
       <div
         className="flex items-center justify-center font-extrabold select-none transition-colors duration-200"
         style={{
-          width: '84px',
-          height: '84px',
+          width: '76px',
+          height: '76px',
           borderRadius: '50%',
-          fontSize: '38px',
+          fontSize: `${badgeFontSize}px`,
           fontFamily: "'D-DIN', 'DIN Alternate', 'DIN', sans-serif",
           backgroundColor: pillBg,
           color: pillColor,
@@ -254,21 +259,23 @@ export const IngredientColumn: React.FC<IngredientColumnProps> = ({
         {count}
       </div>
 
-      {/* Main Track (2분할 회색 트랙: 위/아래 2개 조각, 간격 약 24px, 양끝 완전 둥글게) */}
+      {/* Main Track (막대 폭 80px, 높이 620px, 뱃지 간격 20px, 라벨 간격 16px) */}
       <div
         ref={trackRef}
         onPointerDown={handlePointerDown}
         onPointerMove={(e) => handlePointerMove(e, false)}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
-        className={`relative flex-1 cursor-pointer touch-none select-none ${
+        className={`relative cursor-pointer touch-none select-none ${
           isError ? 'animate-shake' : ''
         }`}
         style={{
-          width: '92px',
-          marginTop: '40px',
-          marginBottom: '20px',
-          backgroundColor: 'transparent', // 분할된 2개 트랙 조각을 보여주기 위해 컨테이너 배경은 투명
+          width: '80px',
+          height: '620px',
+          flex: 'none',
+          marginTop: '20px',
+          marginBottom: '16px',
+          backgroundColor: 'transparent',
         }}
       >
         {/* 회색 트랙 조각 1 (하단, Slot 1) - 높이 48%, 완전히 둥글게, 채워지면 고유색상 */}
@@ -277,37 +284,32 @@ export const IngredientColumn: React.FC<IngredientColumnProps> = ({
           style={{
             bottom: '0%',
             height: `${SLOT_HEIGHT}%`,
-            borderRadius: '46px',
+            borderRadius: '40px',
             backgroundColor: count >= 1 ? ingredient.color : '#EAEAEA',
-            outline: isError ? '4px solid #FF5A4F' : 'none',
+            outline: isError ? '3px solid #FF5A4F' : 'none',
             outlineOffset: '2px',
           }}
         />
 
-        {/* 회색 트랙 조각 2 (상단, Slot 2) - 높이 48%, 완전히 둥글게, 조각 사이 간격 4%(약 24px), 채워지면 고유색상 */}
+        {/* 회색 트랙 조각 2 (상단, Slot 2) - 높이 48%, 완전히 둥글게, 조각 사이 간격 4%, 채워지면 고유색상 */}
         <div
           className="absolute left-0 right-0 pointer-events-none transition-colors duration-180"
           style={{
             bottom: `${SLOT_HEIGHT + SLOT_GAP}%`,
             height: `${SLOT_HEIGHT}%`,
-            borderRadius: '46px',
+            borderRadius: '40px',
             backgroundColor: count >= 2 ? ingredient.color : '#EAEAEA',
-            outline: isError ? '4px solid #FF5A4F' : 'none',
+            outline: isError ? '3px solid #FF5A4F' : 'none',
             outlineOffset: '2px',
           }}
         />
 
-        {/* Floating Illustration
-            - 가로: 바의 좌우 정중앙 (left: 50%, translate -50%)
-            - 세로: 채워진 칸의 맨 윗면에 일러스트 중심이 오게 (translateY 50%)
-            - 0칸일 때도 가로는 바 정중앙, 세로는 바 맨 아래
-            - 크기: 바 폭의 약 120%
-        */}
+        {/* Floating Illustration */}
         <div
           className="absolute pointer-events-none z-10 select-none flex items-center justify-center"
           style={{
             left: '50%',
-            width: '120%', // 92px의 120% = ~110px
+            width: '100%',
             bottom: isZero ? '0%' : `${bottomPercent}%`,
             transform: isZero
               ? `translate(-50%, 15%) scale(${visualScale})`
@@ -319,7 +321,7 @@ export const IngredientColumn: React.FC<IngredientColumnProps> = ({
           }}
         >
           {imgError ? (
-            <svg viewBox="0 0 100 100" style={{ width: '80px', height: '80px' }}>
+            <svg viewBox="0 0 100 100" style={{ width: '68px', height: '68px' }}>
               <circle cx="50" cy="50" r="38" fill={ingredient.color} />
             </svg>
           ) : (
@@ -340,17 +342,23 @@ export const IngredientColumn: React.FC<IngredientColumnProps> = ({
         </div>
       </div>
 
-      {/* Ingredient Name (바 아래 정중앙, 140px 내에 잘림 없이 한 줄 표시) */}
+      {/* Ingredient Name (26px weight 500, 2줄 기준 고정 높이로 첫 줄 시작 위치 통일, word-break: keep-all) */}
       <div
-        className="text-center font-medium select-none whitespace-nowrap w-full"
+        className="text-center select-none w-full flex flex-col items-center justify-start"
         style={{
-          fontSize: '24px',
-          letterSpacing: '-0.5px',
+          fontSize: `${labelFontSize}px`,
+          fontWeight: 500,
+          lineHeight: 1.25,
+          height: '66px',
+          wordBreak: 'keep-all',
           color: '#2B2B2B',
-          paddingBottom: '8px',
         }}
       >
-        {ingredient.name}
+        {(ingredient.labelLines ?? [ingredient.name]).map((line) => (
+          <span key={line} style={{ whiteSpace: 'nowrap' }}>
+            {line}
+          </span>
+        ))}
       </div>
     </div>
   );

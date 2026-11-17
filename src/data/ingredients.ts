@@ -1,6 +1,7 @@
 export interface Ingredient {
   id: string;
   name: string;
+  labelLines?: string[];
   color: string;
   glow?: number;
   image: string;
@@ -22,6 +23,7 @@ export const INGREDIENTS: Ingredient[] = [
   {
     id: 'mix',
     name: '채소믹스',
+    labelLines: ['채소', '믹스'],
     color: '#7BC043',
     glow: 1,
     image: '/assets/aistudio/mix_13eabe79.png',
@@ -69,6 +71,7 @@ export const INGREDIENTS: Ingredient[] = [
   {
     id: 'seaweed',
     name: '해초샐러드',
+    labelLines: ['해초', '샐러드'],
     color: '#2DB68A',
     image: '/assets/aistudio/seaweed_4f52516e.png',
     unitCal: 25,

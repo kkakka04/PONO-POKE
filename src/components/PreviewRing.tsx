@@ -20,9 +20,9 @@ const wedge = (a0: number, a1: number) => {
   return `M${C} ${C}L${x0} ${y0}A${R} ${R} 0 ${large} 1 ${x1} ${y1}Z`;
 };
 
-type Props = { counts: number[]; colors: string[] };
+type Props = { counts: number[]; colors: string[]; fontSize?: number };
 
-export default function PreviewRing({ counts, colors }: Props) {
+export default function PreviewRing({ counts, colors, fontSize = 38 }: Props) {
   const [shown, setShown] = useState<number[]>(counts);
   const targetRef = useRef<number[]>(counts);
   targetRef.current = counts;
@@ -120,7 +120,7 @@ export default function PreviewRing({ counts, colors }: Props) {
         dominantBaseline="central"
         fontFamily="'D-DIN', 'DIN Alternate', 'DIN', sans-serif"
         fontWeight={700}
-        fontSize={36}
+        fontSize={fontSize}
         fill="#1F4D2B"
       >
         {totalTarget}/{MAX_CELLS}
